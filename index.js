@@ -12,22 +12,17 @@ const whitelist = process.env.frontendURL || "http://localhost:3000"
 console.log(whitelist)
 const corsOptions = {
   origin: function (origin, callback) {
-    // if (!origin || whitelist.indexOf(origin) !== -1) {
-    //   callback(null, true)
-    // } else {
-    //   callback(new Error("Not allowed by CORS"))
-    // }
-    callback(null, true)
+    if (!origin || whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error("Not allowed by CORS"))
+    }
   },
   credentials: true,
 }
 dotenv.config();
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
