@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 8080;
 
 const cors = require("cors");
 const whitelist = process.env.frontendURL || "http://localhost:3000"
+console.log(whitelist)
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || whitelist.indexOf(origin) !== -1) {
