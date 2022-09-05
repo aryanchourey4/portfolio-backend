@@ -45,7 +45,7 @@ router.post('/submit-query', async (req, res) => {
         } else {
             console.log('success')
             mailDetails.to = 'aryanchourey4@gmail.com';
-            mailDetails.html = `<p>Hi Aryan!<br><br>You have recieved a message on your website. The details are : <br><br><strong>From : </strong>` + req.body.name + `<br><strong>Email : </strong>` + req.body.email + `<br></strong>Message : ` + req.body.message;
+            mailDetails.html = `<p>Hi Aryan!<br><br>You have recieved a message on your website. The details are : <br><br><strong>From : </strong>` + req.body.name + `<br><strong>Email : </strong>` + req.body.email + `<br><strong>Message : </strong>` + req.body.message;
             await mailTransporter.sendMail(mailDetails);
         }
     });
