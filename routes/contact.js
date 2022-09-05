@@ -38,7 +38,7 @@ router.post('/submit-query',async(req,res)=>{
     mailTransporter.sendMail(mailDetails, async function(err, data) {
         if(err) {
             console.log(err);
-            err = true
+            err = err
             
         } else {
            console.log('success')
