@@ -34,10 +34,12 @@ router.post('/submit-query',async(req,res)=>{
         subject: 'Thanks for submitting your query',
         html: `<p>Dear ${name},<br><br>Thank you for contacting me. I have received your message and will get back to you within 24 hours. Until then, you can give me a call anytime at +91 9871012686 or email me at aryanchourey4@gmail.com<br><br>Thanks and regards,<br>Aryan Chourey</p>`
     };
+    let err = null
     mailTransporter.sendMail(mailDetails, async function(err, data) {
         if(err) {
             console.log(err);
-           
+            err = true
+            
         } else {
            console.log('success')
            mailDetails.to='aryanchourey4@gmail.com';
@@ -48,8 +50,8 @@ router.post('/submit-query',async(req,res)=>{
 
     
     return res.json({
-        error:null,
-        success:true
+        error: err,
+        success: err != null ? true : false,
     })
 
 })
