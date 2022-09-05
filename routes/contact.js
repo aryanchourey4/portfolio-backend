@@ -1,22 +1,22 @@
 const express = require("express");
 const router = express.Router();
-// *Useful for getting environment vairables
+// *Useful for getting environment variables
 const nodemailer = require('nodemailer');
-const {google} = require('googleapis');
-const CLIENT_ID=process.env.CLIENT_ID;
-const CLIENT_SECRET=process.env.CLIENT_SECRET;
-const REFRESH_TOKEN=process.env.REFRESH_TOKEN;
-const REDIRECT='https://developers.google.com/oauthplayground'
-const oauth2Client = new google.auth.OAuth2(CLIENT_ID,CLIENT_SECRET,REDIRECT);
-oauth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
+const { google } = require('googleapis');
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
+const REDIRECT = 'https://developers.google.com/oauthplayground'
+const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT);
+oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-router.post('/submit-query',async(req,res)=>{
+router.post('/submit-query', async (req, res) => {
 
     let name = req.body.name;
     let email = req.body.email;
     let message = req.body.message;
 
-    const accessToken= await oauth2Client.getAccessToken();
+    const accessToken = await oauth2Client.getAccessToken();
     let mailTransporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -35,20 +35,22 @@ router.post('/submit-query',async(req,res)=>{
         html: `<p>Dear ${name},<br><br>Thank you for contacting me. I have received your message and will get back to you within 24 hours. Until then, you can give me a call anytime at +91 9871012686 or email me at aryanchourey4@gmail.com<br><br>Thanks and regards,<br>Aryan Chourey</p>`
     };
     let err = null
-    mailTransporter.sendMail(mailDetails, async function(err, data) {
-        if(err) {
+    let emailErr = false;
+    mailTransporter.sendMail(mailDetails, async function (err, data) {
+        if (err) {
             console.log(err);
             err = err
-            
-        } else {
-           console.log('success')
-           mailDetails.to='aryanchourey4@gmail.com';
-           mailDetails.html=`<p>Hi Aryan!<br><br>You have recieved a message on your website. The details are : <br><br><strong>From : </strong>`+req.body.name+`<br><strong>Email : </strong>`+req.body.email+`<br></strong>Message : `+req.body.message;
-          await  mailTransporter.sendMail(mailDetails);
-        }
-    });  
+            emailErr = true
 
-    
+        } else {
+            console.log('success')
+            mailDetails.to = 'aryanchourey4@gmail.com';
+            mailDetails.html = `<p>Hi Aryan!<br><br>You have recieved a message on your website. The details are : <br><br><strong>From : </strong>` + req.body.name + `<br><strong>Email : </strong>` + req.body.email + `<br></strong>Message : ` + req.body.message;
+            await mailTransporter.sendMail(mailDetails);
+        }
+    });
+
+
     return res.json({
         error: err,
         success: err != null ? true : false,
