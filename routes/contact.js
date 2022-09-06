@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const emailValidator = require('deep-email-validator');
 // *Useful for getting environment variables
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
@@ -15,46 +16,98 @@ router.post('/submit-query', async (req, res) => {
     let name = req.body.name;
     let email = req.body.email;
     let message = req.body.message;
+    async function isEmailValid(email) {
+        return await emailValidator.validate(email)
+    }
+    const { valid, reason, validators } = await isEmailValid(email);
 
-    const accessToken = await oauth2Client.getAccessToken();
-    let mailTransporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            type: 'OAuth2',
-            user: 'aryanchourey4@gmail.com',
-            clientId: CLIENT_ID,
-            clientSecret: CLIENT_SECRET,
-            refreshToken: REFRESH_TOKEN,
-            accessToken: accessToken
-        }
-    });
-    let mailDetails = {
-        from: 'Aryan Chourey <aryanchourey4@gmail.com>',
-        to: email,
-        subject: 'Thanks for submitting your query',
-        html: `<p>Dear ${name},<br><br>Thank you for contacting me. I have received your message and will get back to you within 24 hours. Until then, you can give me a call anytime at +91 9871012686 or email me at aryanchourey4@gmail.com<br><br>Thanks and regards,<br>Aryan Chourey</p>`
-    };
-    let err = null
-    let emailErr = false;
-    mailTransporter.sendMail(mailDetails, async function (err, data) {
-        if (err) {
-            console.log(err);
-            err = err
-            emailErr = true
+    if (valid) {
+        const accessToken = await oauth2Client.getAccessToken();
+        let mailTransporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: 'aryanchourey4@gmail.com',
+                clientId: CLIENT_ID,
+                clientSecret: CLIENT_SECRET,
+                refreshToken: REFRESH_TOKEN,
+                accessToken: accessToken
+            }
+        });
+        let mailDetails = {
+            from: 'Aryan Chourey <aryanchourey4@gmail.com>',
+            to: email,
+            subject: 'Thanks for submitting your query',
+            html: `<p>Dear ${name},<br><br>Thank you for contacting me. I have received your message and will get back to you within 24 hours. Until then, you can give me a call anytime at +91 9871012686 or email me at aryanchourey4@gmail.com<br><br>Thanks and regards,<br>Aryan Chourey</p>`
+        };
+        let err = null
+        let emailErr = false;
+        mailTransporter.sendMail(mailDetails, async function (err, data) {
+            if (err) {
+                console.log(err);
+                err = err
+                emailErr = true
 
-        } else {
-            console.log('success')
-            mailDetails.to = 'aryanchourey4@gmail.com';
-            mailDetails.html = `<p>Hi Aryan!<br><br>You have recieved a message on your website. The details are : <br><br><strong>From : </strong>` + req.body.name + `<br><strong>Email : </strong>` + req.body.email + `<br><strong>Message : </strong>` + req.body.message;
-            await mailTransporter.sendMail(mailDetails);
-        }
-    });
+            } else {
+                console.log('success')
+                mailDetails.to = 'aryanchourey4@gmail.com';
+                mailDetails.html = `<p>Hi Aryan!<br><br>You have recieved a message on your website. The details are : <br><br><strong>From : </strong>` + req.body.name + `<br><strong>Email : </strong>` + req.body.email + `<br><strong>Message : </strong>` + req.body.message;
+                await mailTransporter.sendMail(mailDetails);
+            }
+        });
 
 
-    return res.json({
-        error: err,
-        success: err != null ? true : false,
-    })
+        return res.json({
+            error: err,
+            success: err = true,
+        })
+    }
+
+    else {
+        return res.json({
+            error: err,
+            success: err != null ? true : false,
+        })
+    }
+    // const accessToken = await oauth2Client.getAccessToken();
+    // let mailTransporter = nodemailer.createTransport({
+    //     service: 'gmail',
+    //     auth: {
+    //         type: 'OAuth2',
+    //         user: 'aryanchourey4@gmail.com',
+    //         clientId: CLIENT_ID,
+    //         clientSecret: CLIENT_SECRET,
+    //         refreshToken: REFRESH_TOKEN,
+    //         accessToken: accessToken
+    //     }
+    // });
+    // let mailDetails = {
+    //     from: 'Aryan Chourey <aryanchourey4@gmail.com>',
+    //     to: email,
+    //     subject: 'Thanks for submitting your query',
+    //     html: `<p>Dear ${name},<br><br>Thank you for contacting me. I have received your message and will get back to you within 24 hours. Until then, you can give me a call anytime at +91 9871012686 or email me at aryanchourey4@gmail.com<br><br>Thanks and regards,<br>Aryan Chourey</p>`
+    // };
+    // let err = null
+    // let emailErr = false;
+    // mailTransporter.sendMail(mailDetails, async function (err, data) {
+    //     if (err) {
+    //         console.log(err);
+    //         err = err
+    //         emailErr = true
+
+    //     } else {
+    //         console.log('success')
+    //         mailDetails.to = 'aryanchourey4@gmail.com';
+    //         mailDetails.html = `<p>Hi Aryan!<br><br>You have recieved a message on your website. The details are : <br><br><strong>From : </strong>` + req.body.name + `<br><strong>Email : </strong>` + req.body.email + `<br><strong>Message : </strong>` + req.body.message;
+    //         await mailTransporter.sendMail(mailDetails);
+    //     }
+    // });
+
+
+    // return res.json({
+    //     error: err,
+    //     success: err != null ? true : false,
+    // })
 
 })
 
