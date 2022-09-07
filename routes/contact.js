@@ -60,9 +60,9 @@ router.post('/submit-query', async (req, res) => {
             return res.json({
                 error: null,
                 success:true ,
-            })
-            mailDetails.to = 'aryanchourey4@gmail.com';
-            mailDetails.html = `<p>Hi Aryan!<br><br>You have recieved a message on your website. The details are : <br><br><strong>From : </strong>` + req.body.name + `<br><strong>Email : </strong>` + req.body.email + `<br><strong>Message : </strong>` + req.body.message;
+            }),
+            mailDetails.to = 'aryanchourey4@gmail.com',
+            mailDetails.html = `<p>Hi Aryan!<br><br>You have recieved a message on your website. The details are : <br><br><strong>From : </strong>` + req.body.name + `<br><strong>Email : </strong>` + req.body.email + `<br><strong>Message : </strong>` + req.body.message,
             await mailTransporter.sendMail(mailDetails);
         }
     });
